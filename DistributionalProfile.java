@@ -70,10 +70,8 @@ public class DistributionalProfile
 		         ArrayList<Integer> line_nums=new ArrayList<Integer>(1);
 		         while ((line = br.readLine())!=null) 
 		         {
-		        	 //out2.write(line+"\n");
 		        	 ind++;
-		        	 //System.out.println(ind);
-		        	 linecp=line.substring(line.indexOf("|||")+4);
+		               	 linecp=line.substring(line.indexOf("|||")+4);
 		        	 PP=line.substring(0,line.indexOf("|||"))+"||| "+linecp.substring(0,linecp.indexOf("|||"));
 		        	 sen_id=Integer.parseInt(line.substring(line.lastIndexOf("|||")+4));
 		        	 if(PP.equals(prev_line))
@@ -85,14 +83,11 @@ public class DistributionalProfile
 			        		arin=0;
 			        		if(prev_line!=null)
 			        		{
-			        			//Map2.put(prev_line, line_nums);
-			        			//************* Writing to file***
-			        			
-						    	out3.write(prev_line+"|||");
+			       				//************* Writing to file***
+			        		  	out3.write(prev_line+"|||");
 			        			for (int sen=0;sen<line_nums.size();sen++)
 						    	  {
 						    		  sentence=corpus[line_nums.get(sen)-1]+" ";
-						    		  //System.out.println(sentence);
 						    		  out2.write(sentence);
 						    		  out3.write(sentence);
 
@@ -101,18 +96,15 @@ public class DistributionalProfile
 						    	  out3.write("\n");
 			        			//********************************
 			        			line_nums=new ArrayList<Integer>(1);
-			        			//out2.write(PP+"\n");
 			        		}
 		        	 }
 		        	 line_nums.add(sen_id);
 		        	 prev_line=PP;
 		         }
-		         //Map2.put(prev_line, line_nums);
 		         out3.write(prev_line+"|||");
      			for (int sen=0;sen<line_nums.size();sen++)
 			    	  {
 			    		  sentence=corpus[line_nums.get(sen)-1]+" ";
-			    		  //System.out.println(sentence);
 			    		  out2.write(sentence);
 			    		  out3.write(sentence);
 
@@ -120,42 +112,12 @@ public class DistributionalProfile
 		         System.out.println(ind);
 		         br.close();
 		         in.close();
-		         //System.out.println(Map2.get("! ! ! \" ||| ! ! ! \" ").toString());
-		         //System.out.println(Map2.get("! \" ||| ! \" ").toString());
 		         
-			   //*********** Writing to File**********************************
-			      //String sentence=null;
-			      /*FileReader in2=new FileReader("phrase-table");
-			      br=new BufferedReader(in2);
-			      while((line=br.readLine())!=null)
-			      {
-			    	  linecp=line.substring(line.indexOf("|||")+4);
-			    	  PP=line.substring(0,line.indexOf("|||"))+"||| "+linecp.substring(0,linecp.indexOf("|||"));
-			    	  System.out.println(PP);
-			    	  line_nums=Map2.get(PP);
-			    	  out3.write(PP+"|||");
-			    	  if(line_nums!=null)
-			    	  for (int sen=0;sen<line_nums.size();sen++)
-			    	  {
-			    		  sentence=corpus[line_nums.get(sen)-1]+" ";
-			    		  System.out.println(sentence);
-			    		  out2.write(sentence);
-			    		  out3.write(sentence);
-
-			    	  }
-			    	  else
-			    		  out2.write("\n");
-			    	  
-			    	  out2.write("\n");
-			    	  out3.write("\n");
-			    		  
-			      }*/
 			      out2.close();
 			      out3.close();
 		         
 			}
 			catch (Exception e)
-	      //finally
 		      {
 				e.printStackTrace();
 		         if (in != null) 
@@ -224,7 +186,6 @@ System.out.println("Done Runnung the Model");
 
 				// Get an array of sorted sets of word ID/count pairs
 				ArrayList<TreeSet<IDSorter>> topicSortedWords = model.getSortedWords();
-				//ArrayList<TreeSet<IDSorter>> topicSortedProbs = model.get
 				// Show top 5 words in topics with proportions for the first document
 				for (int topic = 0; topic < numTopics; topic++) {
 					Iterator<IDSorter> iterator = topicSortedWords.get(topic).iterator();
