@@ -272,7 +272,7 @@ public class DistributionalProfile
 					        	 
 					        	 int j;
 					        	 String output="<seg topic=\"";
-					 			 for (j=0;j<50;j++) 
+					 			 for (j=0;j<numTopics;j++) 
 					 				 output=output+Integer.toString(j)+" "+String.format("%.5f", testProbs[j])+" ";
 					 			 output=output+("\">"+line+"</seg>\n");
 					 			 out1.write(output);
@@ -307,7 +307,7 @@ public class DistributionalProfile
 				        	 
 				        	 int j;
 				        	 String output="<seg topic=\"";
-				 			 for (j=0;j<50;j++) 
+				 			 for (j=0;j<numTopics;j++) 
 				 				 output=output+Integer.toString(j)+" "+String.format("%.5f", testProbs[j])+" ";
 				 			 output=output+("\">"+line+"</seg>\n");
 				 			 out1.write(output);
