@@ -86,6 +86,7 @@ public class DistributionalProfile
 			        			//************* Writing to file***
 			        			
 						    	out3.write(prev_line+"|||");
+						    	out2.write(0+"\tX\t");
 			        			for (int sen=0;sen<line_nums.size();sen++)
 						    	  {
 						    		  sentence=corpus[line_nums.get(sen)-1]+" ";
@@ -103,6 +104,7 @@ public class DistributionalProfile
 		        	 prev_line=PP;
 		         }
 		         out3.write(prev_line+"|||");
+		         out2.write(0+"\tX\t");
      			for (int sen=0;sen<line_nums.size();sen++)
 			    	  {
 			    		  sentence=corpus[line_nums.get(sen)-1]+" ";
@@ -135,7 +137,7 @@ public class DistributionalProfile
 		//*****************************************************************************
 		//********************Training Topic Models************************************
 		//*****************************************************************************
-				// Begin by importing documents from text to feature sequences
+			// Begin by importing documents from text to feature sequences
 				ArrayList<Pipe> pipeList = new ArrayList<Pipe>();
 
 				// Pipes: lowercase, tokenize, remove stopwords, map to features
@@ -145,11 +147,11 @@ public class DistributionalProfile
 				pipeList.add( new TokenSequence2FeatureSequence() );
 
 				InstanceList instances = new InstanceList (new SerialPipes(pipeList));
-
+				System.out.println("Adding Instances...");
 				Reader fileReader = new InputStreamReader(new FileInputStream(new File("PDs.txt")), "UTF-8");
 				instances.addThruPipe(new CsvIterator (fileReader, Pattern.compile("^(\\S*)[\\s,]*(\\S*)[\\s,]*(.*)$"),
 													   3, 2, 1)); // data, label, name fields
-System.out.println("Done Adding Instances...");
+
 				// Create a model with 100 topics, alpha_t = 0.01, beta_w = 0.01
 				//  Note that the first parameter is passed as the sum over topics, while
 				//  the second is 
@@ -161,13 +163,15 @@ System.out.println("Done Adding Instances...");
 				// Use two parallel samplers, which each look at one half the corpus and combine
 				//  statistics after every iteration.
 				model.setNumThreads(2);
+				System.out.println("Estimating...");
 
 				// Run the model for 50 iterations and stop (this is for testing only, 
 				//  for real applications, use 1000 to 2000 iterations)
 				model.setNumIterations(1000);
 				model.estimate();
-System.out.println("Done Runnung the Model");
-				// Show the words and topics in the first instance
+				File f = new File("topicmodel");
+				model.write(f);
+				// ShowD the words and topics in the first instance
 
 				// The data alphabet maps word IDs to strings
 				Alphabet dataAlphabet = instances.getDataAlphabet();
@@ -187,6 +191,7 @@ System.out.println("Done Runnung the Model");
 
 				// Get an array of sorted sets of word ID/count pairs
 				ArrayList<TreeSet<IDSorter>> topicSortedWords = model.getSortedWords();
+				//ArrayList<TreeSet<IDSorter>> topicSortedProbs = model.get
 				// Show top 5 words in topics with proportions for the first document
 				for (int topic = 0; topic < numTopics; topic++) {
 					Iterator<IDSorter> iterator = topicSortedWords.get(topic).iterator();
@@ -213,6 +218,114 @@ System.out.println("Done Runnung the Model");
 					rank++;
 				}
 				TopicInferencer inferencer = model.getInferencer();
+				
+				//************************************************************************
+				//************************************************************************
+				FileReader in = null;
+			    FileWriter out1 = null;	
+			    //***********************************************************************
+			    try {
+			         in = new FileReader("phrase-table");
+			         out1 = new FileWriter("phrase-table-topics");
+			         
+			         BufferedReader br=new BufferedReader(in);
+			         String line;
+			         int index=0;
+			         while ((line = br.readLine())!=null) 
+			         	{
+			        	// Estimate the topic distribution of this instance, 
+							//  given the current Gibbs state.
+							topicDistribution = model.getTopicProbabilities(index);
+			        	 line=line+"{{Topics ";
+			        	 for (int i=0;i<numTopics;i++)
+			        			 {
+			        				 line=line+String.format("%.5f", topicDistribution[i])+" ";
+			        			 }
+			        	 out1.write(line+"}}\n");
+			        	 index++;
+			         	}
+			      	 }
+			      finally 
+			      {
+			         if (in != null) 
+			         {
+			            in.close();
+			         }
+			         if (out1 != null)
+			         {
+			            out1.close();
+			         }
+			      }	
+			  //************************************************************************		   
+			      try {
+				         in = new FileReader("Dev.fa");
+				         out1 = new FileWriter("Dev.fa.topics.ixml");
+				         
+				         BufferedReader br=new BufferedReader(in);
+				         String line;
+				         while ((line = br.readLine())!=null) 
+				         	{
+				        	 InstanceList testing1 = new InstanceList(instances.getPipe());
+					     		testing1.addThruPipe(new Instance(line, null, "test instance", null));
+
+					        	 double[] testProbs = inferencer.getSampledDistribution(testing1.get(0), 10, 1, 5);
+					        	 
+					        	 int j;
+					        	 String output="<seg topic=\"";
+					 			 for (j=0;j<50;j++) 
+					 				 output=output+Integer.toString(j)+" "+String.format("%.5f", testProbs[j])+" ";
+					 			 output=output+("\">"+line+"</seg>\n");
+					 			 out1.write(output);
+				         	}
+				      	 }
+				      finally 
+				      {
+				         if (in != null) 
+				         {
+				            in.close();
+				         }
+				         if (out1 != null)
+				         {
+				            out1.close();
+				         }
+				      }	
+			     
+			    //***********************************************************************
+			    try
+			    {
+			    	in = new FileReader("NIST.fa");
+			         out1 = new FileWriter("NIST.fa.topics.ixml");
+			         
+			         BufferedReader br=new BufferedReader(in);
+			         String line;
+			         while ((line = br.readLine())!=null) 
+			         {
+			        	 InstanceList testing1 = new InstanceList(instances.getPipe());
+				     		testing1.addThruPipe(new Instance(line, null, "test instance", null));
+
+				        	 double[] testProbs = inferencer.getSampledDistribution(testing1.get(0), 10, 1, 5);
+				        	 
+				        	 int j;
+				        	 String output="<seg topic=\"";
+				 			 for (j=0;j<50;j++) 
+				 				 output=output+Integer.toString(j)+" "+String.format("%.5f", testProbs[j])+" ";
+				 			 output=output+("\">"+line+"</seg>\n");
+				 			 out1.write(output);
+			         }
+			    	
+			    }
+			    finally
+			    {
+			    	if (in != null) 
+			         {
+			            in.close();
+			         }
+			         if (out1 != null)
+			         {
+			            out1.close();
+			         }
+			    }
+			    //***********************************************************************
 
 	}
 
