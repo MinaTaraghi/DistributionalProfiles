@@ -44,7 +44,6 @@ public class DistributionalProfile
 		FileReader in=null;
 		FileWriter out2= new FileWriter("PDs.txt");
 		FileWriter out3= new FileWriter("ppPDs.txt");
-		HashMap<String, ArrayList<Integer>> Map2=new HashMap<String, ArrayList<Integer>>();
         int ind=0;
 
 	      try{
