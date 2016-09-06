@@ -1,32 +1,12 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Formatter;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.TreeSet;
-import java.util.regex.Pattern;
+import cc.mallet.util.*;
+import cc.mallet.types.*;
+import cc.mallet.pipe.*;
+import cc.mallet.pipe.iterator.*;
+import cc.mallet.topics.*;
 
-import cc.mallet.pipe.CharSequence2TokenSequence;
-import cc.mallet.pipe.CharSequenceLowercase;
-import cc.mallet.pipe.Pipe;
-import cc.mallet.pipe.SerialPipes;
-import cc.mallet.pipe.TokenSequence2FeatureSequence;
-import cc.mallet.pipe.TokenSequenceRemoveStopwords;
-import cc.mallet.pipe.iterator.CsvIterator;
-import cc.mallet.topics.ParallelTopicModel;
-import cc.mallet.topics.TopicInferencer;
-import cc.mallet.types.Alphabet;
-import cc.mallet.types.FeatureSequence;
-import cc.mallet.types.IDSorter;
-import cc.mallet.types.InstanceList;
-import cc.mallet.types.LabelSequence;
+import java.util.*;
+import java.util.regex.*;
+import java.io.*;
 
 
 public class DistributionalProfile 
@@ -39,7 +19,7 @@ public class DistributionalProfile
 	{
 		// TODO Auto-generated method stub
 		//*****************************************************************************
-		//********************Creating Pesudo-Docs ************************************
+		//********************Creating Pseudo-Docs ************************************
 		//*****************************************************************************
 		FileReader in=null;
 		FileWriter out2= new FileWriter("PDs.txt");
@@ -48,10 +28,11 @@ public class DistributionalProfile
 
 	      try{
 	    	  	//********** Reading Corpus ****************
+	    	  	 int corpus_size=99923;
 		         FileReader in3=new FileReader("cleanParallel.fa");
-		         String [] corpus=new String[99923];
+		         String [] corpus=new String[corpus_size];
 		         BufferedReader br=new BufferedReader(in3);
-		         for (int l=0;l<99923;l++)
+		         for (int l=0;l<corpus_size;l++)
 		        	 corpus[l]=br.readLine();
 		         br.close();
 		         in3.close();
@@ -59,12 +40,8 @@ public class DistributionalProfile
 				in=new FileReader("extract.sorted");
 				br=new BufferedReader(in);
 				String sentence;
-		         String line;
-		         String linecp;
-		         String prev_line=null;
-		         int arin=0;
-		         int sen_id;
-		         String PP;
+		         String line,linecp,PP,prev_line=null;
+		         int sen_id,arin=0;
 		         System.out.println(ind);
 		         ArrayList<Integer> line_nums=new ArrayList<Integer>(1);
 		         while ((line = br.readLine())!=null) 
@@ -220,7 +197,7 @@ public class DistributionalProfile
 				
 				//************************************************************************
 				//************************************************************************
-				FileReader in = null;
+				in = null;
 			    FileWriter out1 = null;	
 			    //***********************************************************************
 			    try {
@@ -232,16 +209,16 @@ public class DistributionalProfile
 			         int index=0;
 			         while ((line = br.readLine())!=null) 
 			         	{
-			        	// Estimate the topic distribution of this instance, 
+			        	 	// Estimate the topic distribution of this instance, 
 							//  given the current Gibbs state.
 							topicDistribution = model.getTopicProbabilities(index);
-			        	 line=line+"{{Topics ";
-			        	 for (int i=0;i<numTopics;i++)
+							line=line+"{{Topics ";
+							for (int i=0;i<numTopics;i++)
 			        			 {
 			        				 line=line+String.format("%.5f", topicDistribution[i])+" ";
 			        			 }
-			        	 out1.write(line+"}}\n");
-			        	 index++;
+							out1.write(line+"}}\n");
+							index++;
 			         	}
 			      	 }
 			      finally 
@@ -264,7 +241,7 @@ public class DistributionalProfile
 				         String line;
 				         while ((line = br.readLine())!=null) 
 				         	{
-				        	 InstanceList testing1 = new InstanceList(instances.getPipe());
+				        	 	InstanceList testing1 = new InstanceList(instances.getPipe());
 					     		testing1.addThruPipe(new Instance(line, null, "test instance", null));
 
 					        	 double[] testProbs = inferencer.getSampledDistribution(testing1.get(0), 10, 1, 5);
@@ -277,7 +254,7 @@ public class DistributionalProfile
 					 			 out1.write(output);
 				         	}
 				      	 }
-				      finally 
+				  finally 
 				      {
 				         if (in != null) 
 				         {
@@ -292,14 +269,14 @@ public class DistributionalProfile
 			    //***********************************************************************
 			    try
 			    {
-			    	in = new FileReader("NIST.fa");
+			    	 in = new FileReader("NIST.fa");
 			         out1 = new FileWriter("NIST.fa.topics.ixml");
 			         
 			         BufferedReader br=new BufferedReader(in);
 			         String line;
 			         while ((line = br.readLine())!=null) 
 			         {
-			        	 InstanceList testing1 = new InstanceList(instances.getPipe());
+			        	 	InstanceList testing1 = new InstanceList(instances.getPipe());
 				     		testing1.addThruPipe(new Instance(line, null, "test instance", null));
 
 				        	 double[] testProbs = inferencer.getSampledDistribution(testing1.get(0), 10, 1, 5);
